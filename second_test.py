@@ -26,10 +26,6 @@ def joint_force3(x):
     returnCode=vrep.simxSetJointTargetPosition(clientID,phantom_joint_3,x,vrep.simx_opmode_oneshot)
 def joint_force4(x):
     returnCode=vrep.simxSetJointTargetPosition(clientID,phantom_joint_4,x,vrep.simx_opmode_oneshot)
-"""def phantom_gripper_joint_force(x):
-    returnCode = vrep.simxSetJointTargetPosition(clientID, phantom_gripper_joint, x, vrep.simx_opmode_oneshot)
-def phantom_gripper_close_joint_force(x):
-    returnCode = vrep.simxSetJointTargetPosition(clientID, phantom_gripper_close_joint, x, vrep.simx_opmode_oneshot)"""
 def operate_gripper(x):
     # Set x to 0 to open, 1 to close the gripper
     if x == 0:
@@ -41,10 +37,33 @@ def operate_gripper(x):
         returnCode_2 = vrep.simxSetIntegerSignal(clientID, "_gripperClose", 1, vrep.simx_opmode_oneshot)
         returnCode_3 = vrep.simxSetJointTargetVelocity(clientID, phantom_gripper_close_joint, -2, vrep.simx_opmode_oneshot)
 
+opmode=vrep.simx_opmode_blocking
+res, cuboid0Handle=vrep.simxGetObjectHandle(clientID,"Cuboid0",vrep.simx_opmode_oneshot_wait)
+res, cuboidHash0Handle=vrep.simxGetObjectHandle(clientID,"Cuboid0#0",opmode)
+
+errorCode,cuboid0=vrep.simxGetObjectHandle(clientID,'cuboid0',vrep.simx_opmode_blocking)
+
+returnCode_1,cuboid_position=vrep.simxGetObjectPosition(clientID,cuboid0Handle,-1,vrep.simx_opmode_streaming)
+
+print(res)
+print(cuboid_position)
+
 while True:
     joint_force1(0.0)
     joint_force2(1.6)
     joint_force3(0.0)
     joint_force4(1.75)
-    returnCode=vrep.simxSetJointTargetVelocity(clientID,phantom_gripper_close_joint,0.00,vrep.simx_opmode_oneshot)
+    #returnCode=vrep.simxSetJointTargetVelocity(clientID,phantom_gripper_close_joint,0.00,vrep.simx_opmode_oneshot)
+    #returnCode = vrep.simxSetJointForce(clientID, phantom_gripper_close_joint,5.0, vrep.simx_opmode_oneshot)
+    #print(force)
     operate_gripper(0)
+    #print(position)
+    res, cuboid0Handle = vrep.simxGetObjectHandle(clientID, "Cuboid0", vrep.simx_opmode_oneshot_wait)
+    returnCode_1, cuboid_position = vrep.simxGetObjectPosition(clientID, cuboid0Handle, -1, vrep.simx_opmode_streaming)
+    #print(cuboid_position)
+    res, landing_zone = vrep.simxGetObjectHandle(clientID,"landing_zone",vrep.simx_opmode_oneshot_wait)
+    returnCode_2, landing_zone_position = vrep.simxGetObjectPosition(clientID, landing_zone, -1, vrep.simx_opmode_streaming)
+    #print("Landing Zone:", landing_zone_position)
+    returnCode,handle_1=vrep.simxGetCollisionHandle(clientID,"Collision0",vrep.simx_opmode_blocking)
+    returnCode, collisionState=vrep.simxReadCollision(clientID,handle_1,vrep.simx_opmode_streaming)
+    print(collisionState)
